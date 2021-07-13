@@ -24,7 +24,13 @@ export default function Home() {
     'peas',
     'rafaballerini',
     'felipefialho',
-    'marcobrunodev'
+    'marcobrunodev',
+    'willianjusten',
+    'rodrigoktarouco',
+    'andre-noel',
+    'emersonbroga',
+    'diego3g',
+    'maykbrito'
   ]
   
   return (
