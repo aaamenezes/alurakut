@@ -9,7 +9,10 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    background-color: #D9E6F6;
+    /* background-color: #D9E6F6; */
+    background-image: url('/images/kratos.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
     font-family: sans-serif;
   }
 

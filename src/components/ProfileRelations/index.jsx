@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { Box } from '../Box'
 
-export const ProfileRelationsBoxWrapper = styled(Box)`
+const ProfileRelationsBoxStyled = styled(Box)`
   ul {
     display: grid;
     grid-gap: 8px;
@@ -49,4 +49,33 @@ export const ProfileRelationsBoxWrapper = styled(Box)`
       background-image: linear-gradient(0deg,#00000073,transparent);
     }
   }
-`;
+`
+
+function ProfileRelationsBox({ title, listItems }) {
+  console.log('listItems', listItems)
+  return (
+    <ProfileRelationsBoxStyled>
+      <h2 className='smallTitle'>
+        {title} ({listItems.length})
+      </h2>
+      <ul>
+        {listItems.map(item => {
+          const itemTitle = item.title ? item.title : item
+          const itemURL = item.url ? item.url : `https://github.com/${itemTitle}`
+          const itemImage = item.image ? item.image : `https://github.com/${item}.png`
+
+          return (
+            <li key={itemTitle}>
+              <a href={itemURL}>
+                <img src={itemImage} />
+                <span>{itemTitle}</span>
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+    </ProfileRelationsBoxStyled>
+  )
+}
+
+export default ProfileRelationsBox
