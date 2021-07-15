@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Box } from '../src/components/Box'
 import ProfileRelationsBox from '../src/components/ProfileRelations'
 import MainGrid from '../src/components/MainGrid'
@@ -29,12 +29,12 @@ function ProfileSidebar({ githubUser }) {
 
 export default function Home() {
   const githubUser = 'aaamenezes'
-  const initialComunity = {
+  const initialCommunity = {
     title: 'Eu odeio acorder cedo',
     image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg',
     url: 'https://www.orkut.com/'
   }
-  const [ comunities, setComunities ] = useState([initialComunity])
+  const [ communities, setCommunities ] = useState([initialCommunity])
   const favoritePeople = [
     'omariosouto',
     'rodrigoktarouco',
@@ -49,6 +49,17 @@ export default function Home() {
     // 'emersonbroga',
     // 'maykbrito'
   ]
+
+  const [ followers, setFollowers ] = useState([])
+
+  useEffect(() => {
+    fetch('https://api.github.com/users/aaamenezes/followers')
+      .then(r => r.json())
+      .then(r => {
+        const rFormatted = r.map(item => item.login)
+        setFollowers(rFormatted)
+      })
+  }, [])
 
   return (
     <>
@@ -66,14 +77,14 @@ export default function Home() {
             <h2 className='subTitle'>O que vc deseja fazer?</h2>
             <form onSubmit={event => {
               event.preventDefault()
-              if (comunities.length < 6) {
+              if (communities.length < 6) {
                 const formData = new FormData(event.target)
-                const addedComunnity = {
+                const addedCommunity = {
                   title: formData.get('title'),
                   image: formData.get('image'),
                   url: formData.get('url')
                 }
-                setComunities([ ...comunities, addedComunnity ])
+                setCommunities([ ...communities, addedCommunity ])
               }
             }}>
               <div>
@@ -108,9 +119,13 @@ export default function Home() {
         </div>
         <div className='profileRelationsArea' style={{ gridArea: 'profileRelations' }}>
           <ProfileRelationsBox
+            title='Seguidores'
+            listItems={followers}
+          />
+          <ProfileRelationsBox
             title='Comunidades'
-            listItems={comunities}
-            />
+            listItems={communities}
+          />
           <ProfileRelationsBox
             title='Pessoas da comunidade'
             listItems={favoritePeople}
