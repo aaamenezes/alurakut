@@ -51,7 +51,7 @@ const ProfileRelationsBoxStyled = styled(Box)`
   }
 `
 
-function ProfileRelationsBox({ title, listItems }) {
+function ProfileRelationsBox({ title, type, listItems }) {
   return (
     <ProfileRelationsBoxStyled>
       <h2 className='smallTitle'>
@@ -60,8 +60,8 @@ function ProfileRelationsBox({ title, listItems }) {
       <ul>
         {listItems.map((item, index) => {
           const itemTitle = item.title ? item.title : item
-          const itemURL = item.url ? item.url : `https://github.com/${itemTitle}`
-          const itemImage = item.image ? item.image : `https://github.com/${item}.png`
+          const itemURL = `/${type}/${item.id}`
+          const itemImage = item.imageUrl ? item.imageUrl : `https://github.com/${item}.png`
 
           if (index < 6) {
             return (

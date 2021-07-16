@@ -29,12 +29,7 @@ function ProfileSidebar({ githubUser }) {
 
 export default function Home() {
   const githubUser = 'aaamenezes'
-  const initialCommunity = {
-    title: 'Eu odeio acorder cedo',
-    image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg',
-    url: 'https://www.orkut.com/'
-  }
-  const [ communities, setCommunities ] = useState([initialCommunity])
+  const [ communities, setCommunities ] = useState([])
   const favoritePeople = [
     'omariosouto',
     'rodrigoktarouco',
@@ -59,7 +54,63 @@ export default function Home() {
         const rFormatted = r.map(item => item.login)
         setFollowers(rFormatted)
       })
+
+    // GraphQL
+    const communityQuery = {
+      query: `query {
+        allCommunities {
+          id
+          title
+          imageUrl
+          creatorSlug
+        }
+      }`
+    }
+
+    const communityConf = {
+      method: 'POST',
+      headers: {
+        'Authorization': '5562720c87d0c6d702ed3649a523ba',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(communityQuery)
+    }
+
+    const queryURL = 'https://graphql.datocms.com/'
+
+    fetch(queryURL, communityConf)
+      .then(r => r.json())
+      .then(r => {
+        console.log(r)
+        setCommunities(r.data.allCommunities)
+      })
   }, [])
+
+  function handleSubmit(event) {
+    event.preventDefault()
+    if (communities.length < 6) {
+      const formData = new FormData(event.target)
+
+      const addedCommunity = {
+        title: formData.get('title'),
+        imageUrl: formData.get('image'),
+        creatorSlug: githubUser
+      }
+
+      fetch('/api/communities', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(addedCommunity)
+      })
+        .then(async r => {
+          const data = await r.json()
+          setCommunities([ ...communities, data.createdRegister ])
+        })
+    }
+  }
 
   return (
     <>
@@ -75,18 +126,7 @@ export default function Home() {
           </Box>
           <Box>
             <h2 className='subTitle'>O que vc deseja fazer?</h2>
-            <form onSubmit={event => {
-              event.preventDefault()
-              if (communities.length < 6) {
-                const formData = new FormData(event.target)
-                const addedCommunity = {
-                  title: formData.get('title'),
-                  image: formData.get('image'),
-                  url: formData.get('url')
-                }
-                setCommunities([ ...communities, addedCommunity ])
-              }
-            }}>
+            <form onSubmit={handleSubmit}>
               <div>
                 <input
                   type='text'
@@ -120,14 +160,17 @@ export default function Home() {
         <div className='profileRelationsArea' style={{ gridArea: 'profileRelations' }}>
           <ProfileRelationsBox
             title='Seguidores'
+            type='person'
             listItems={followers}
           />
           <ProfileRelationsBox
             title='Comunidades'
+            type='community'
             listItems={communities}
           />
           <ProfileRelationsBox
             title='Pessoas da comunidade'
+            type='person'
             listItems={favoritePeople}
           />
         </div>
