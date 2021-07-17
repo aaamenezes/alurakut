@@ -1,4 +1,7 @@
+import React from 'react'
 import { useEffect, useState } from 'react'
+import nookie from 'nookies'
+import jwt from 'jsonwebtoken'
 import { Box } from '../src/components/Box'
 import ProfileRelationsBox from '../src/components/ProfileRelations'
 import MainGrid from '../src/components/MainGrid'
@@ -27,8 +30,8 @@ function ProfileSidebar({ githubUser }) {
   )
 }
 
-export default function Home() {
-  const githubUser = 'aaamenezes'
+export default function Home(props) {
+  const githubUser = props.githubUser
   const [ communities, setCommunities ] = useState([])
   const favoritePeople = [
     'omariosouto',
@@ -82,7 +85,6 @@ export default function Home() {
     fetch(queryURL, communityConf)
       .then(r => r.json())
       .then(r => {
-        console.log(r)
         setCommunities(r.data.allCommunities)
       })
   }, [])
@@ -177,4 +179,28 @@ export default function Home() {
       </MainGrid>
     </>
   )
+}
+
+export async function getServerSideProps(context) {
+  const cookies = nookie.get(context)
+  const token = cookies.USER_TOKEN
+  
+  const { isAuthenticated } = fetch('https://alurakut.vercel.app/api/auth', {
+    headers: {
+      Authorization: token
+    }
+  }).then(r => r.json())
+  
+  const { githubUser } = jwt.decode(token)
+
+  // if (!isAuthenticated) {
+  //   return {
+  //     redirect: {
+  //       destination: '/login',
+  //       permanent: false
+  //     }
+  //   }
+  // }
+
+  return { props: { githubUser } }
 }
