@@ -8,6 +8,7 @@ import MainGrid from '../src/components/MainGrid'
 import {
   AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet
 } from '../src/lib/AlurakutCommons'
+import Button from '../src/components/Button'
 
 function ProfileSidebar({ githubUser }) {
   const imageURL = `https://github.com/${githubUser}.png`
@@ -30,8 +31,7 @@ function ProfileSidebar({ githubUser }) {
   )
 }
 
-export default function Home(props) {
-  const githubUser = props.githubUser
+export default function Home({ githubUser }) {
   const [ communities, setCommunities ] = useState([])
   const favoritePeople = [
     'omariosouto',
@@ -46,7 +46,13 @@ export default function Home(props) {
     // 'willianjusten',
     // 'emersonbroga',
     // 'maykbrito'
-  ]
+  ].map(person => {
+    return {
+      title: person,
+      imageUrl: `https://github.com/${person}.png`,
+      pageUrl: `https://github.com/${person}`
+    }
+  })
 
   const [ followers, setFollowers ] = useState([])
 
@@ -54,7 +60,13 @@ export default function Home(props) {
     fetch('https://api.github.com/users/aaamenezes/followers')
       .then(r => r.json())
       .then(r => {
-        const rFormatted = r.map(item => item.login)
+        const rFormatted = r.map(item => {
+          return {
+            title: item.login,
+            imageUrl: item.avatar_url,
+            pageUrl: item.html_url
+          }
+        })
         setFollowers(rFormatted)
       })
 
@@ -65,12 +77,12 @@ export default function Home(props) {
           id
           title
           imageUrl
-          creatorSlug
+          pageUrl
         }
       }`
     }
 
-    const communityConf = {
+    fetch('https://graphql.datocms.com/', {
       method: 'POST',
       headers: {
         'Authorization': '5562720c87d0c6d702ed3649a523ba',
@@ -78,40 +90,40 @@ export default function Home(props) {
         'Accept': 'application/json'
       },
       body: JSON.stringify(communityQuery)
-    }
-
-    const queryURL = 'https://graphql.datocms.com/'
-
-    fetch(queryURL, communityConf)
+    })
       .then(r => r.json())
       .then(r => {
         setCommunities(r.data.allCommunities)
       })
   }, [])
 
-  function handleSubmit(event) {
+  const [ activeForm, setActiveForm ] = useState('community')
+
+  function handleSubmitCommunity(event) {
     event.preventDefault()
-    if (communities.length < 6) {
-      const formData = new FormData(event.target)
+    const formData = new FormData(event.target)
 
-      const addedCommunity = {
-        title: formData.get('title'),
-        imageUrl: formData.get('image'),
-        creatorSlug: githubUser
-      }
-
-      fetch('/api/communities', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(addedCommunity)
-      })
-        .then(async r => {
-          const data = await r.json()
-          setCommunities([ ...communities, data.createdRegister ])
-        })
+    const addedCommunity = {
+      title: formData.get('title'),
+      imageUrl: formData.get('image'),
+      pageUrl: formData.get('url'),
     }
+
+    fetch('/api/communities', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(addedCommunity)
+    })
+      .then(async r => {
+        const data = await r.json()
+        setCommunities([ ...communities, data.createdRegister ])
+      })
+  }
+
+  function handleSubmitPerson(event) {
+    return true
   }
 
   return (
@@ -127,36 +139,73 @@ export default function Home(props) {
             <OrkutNostalgicIconSet />
           </Box>
           <Box>
-            <h2 className='subTitle'>O que vc deseja fazer?</h2>
-            <form onSubmit={handleSubmit}>
-              <div>
-                <input
-                  type='text'
-                  name='title'
-                  placeholder='Nome da comunidade...'
-                  aria-label='Nome da comunidade...'
-                />
-              </div>
-              <div>
-                <input
-                  type='text'
-                  name='image'
-                  placeholder='URL de capa'
-                  aria-label='URL de capa'
-                />
-              </div>
-              <div>
-                <input
-                  type='text'
-                  name='url'
-                  placeholder='URL de direcionamento'
-                  aria-label='URL de direcionamento'
-                />
-              </div>
-              <div>
-                <button type="submit">Criar comunidade</button>
-              </div>
-            </form>
+            <Box style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              paddingLeft: 0,
+              paddingRight: 0,
+            }}>
+              <Button
+                type='button'
+                text='Criar comunidade'
+                active={activeForm === 'community'}
+                onClick={() => setActiveForm('community')}
+              />
+              <Button
+                type='button'
+                text='Adicionar pessoa da comunidade'
+                active={activeForm === 'person'}
+                onClick={() => setActiveForm('person')}
+              />
+            </Box>
+            {
+              activeForm === 'community' &&
+              <form onSubmit={handleSubmitCommunity}>
+                <div>
+                  <input
+                    type='text'
+                    name='title'
+                    placeholder='Nome da comunidade...'
+                    aria-label='Nome da comunidade...'
+                  />
+                </div>
+                <div>
+                  <input
+                    type='text'
+                    name='image'
+                    placeholder='URL de capa'
+                    aria-label='URL de capa'
+                  />
+                </div>
+                <div>
+                  <input
+                    type='text'
+                    name='url'
+                    placeholder='URL de direcionamento'
+                    aria-label='URL de direcionamento'
+                  />
+                </div>
+                <div>
+                  <button type="submit">Criar comunidade</button>
+                </div>
+              </form>
+            }
+            {
+              activeForm === 'person' &&
+              <form onSubmit={handleSubmitPerson}>
+                <div>
+                  <input
+                    type='text'
+                    name='nickname'
+                    placeholder='Nick da pessoa no Github...'
+                    aria-label='Nick da pessoa no Github...'
+                  />
+                </div>
+                <div>
+                  <button type="submit">Adicionar pessoa</button>
+                </div>
+              </form>
+            }
           </Box>
         </div>
         <div className='profileRelationsArea' style={{ gridArea: 'profileRelations' }}>

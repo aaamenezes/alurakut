@@ -6,7 +6,7 @@ const ProfileRelationsBoxStyled = styled(Box)`
     display: grid;
     grid-gap: 8px;
     grid-template-columns: 1fr 1fr 1fr; 
-    max-height: 220px;
+    /* max-height: 220px; */
     list-style: none;
   }
   img {
@@ -59,20 +59,14 @@ function ProfileRelationsBox({ title, type, listItems }) {
       </h2>
       <ul>
         {listItems.map((item, index) => {
-          const itemTitle = item.title ? item.title : item
-          const itemURL = `/${type}/${item.id}`
-          const itemImage = item.imageUrl ? item.imageUrl : `https://github.com/${item}.png`
-
-          if (index < 6) {
-            return (
-              <li key={itemTitle}>
-                <a href={itemURL}>
-                  <img src={itemImage} />
-                  <span>{itemTitle}</span>
-                </a>
-              </li>
-            )
-          }
+          return (
+            <li key={item.title}>
+              <a href={item.pageUrl} target='_blank' rel='external noopener'>
+                <img src={item.imageUrl} />
+                <span>{item.title}</span>
+              </a>
+            </li>
+          )
         })}
       </ul>
     </ProfileRelationsBoxStyled>
