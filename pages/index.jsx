@@ -34,20 +34,8 @@ function ProfileSidebar({ githubUser }) {
 export default function Home({ githubUser }) {
   const [ communities, setCommunities ] = useState([])
   const [ favoritePeople, setFavoritePeople ] = useState([])
-
-  // 'omariosouto',
-  // 'andre-noel',
-  // 'juunegreiros',
-  // 'felipefialho',
-  // 'diego3g',
-  // 'peas',
-  // 'rafaballerini',
-  // 'marcobrunodev',
-  // 'willianjusten',
-  // 'emersonbroga',
-  // 'maykbrito'
-
   const [ followers, setFollowers ] = useState([])
+  const [ activeForm, setActiveForm ] = useState('community')
 
   useEffect(() => {
     // Carregar seguidores do Github
@@ -123,8 +111,6 @@ export default function Home({ githubUser }) {
 
   }, [])
 
-  const [ activeForm, setActiveForm ] = useState('community')
-
   function handleSubmitCommunity(event) {
     event.preventDefault()
     const formData = new FormData(event.target)
@@ -149,7 +135,24 @@ export default function Home({ githubUser }) {
   }
 
   function handleSubmitPerson(event) {
-    
+    event.preventDefault()
+    const formData = new FormData(event.target)
+
+    const addedPerson = {
+      nickname: formData.get('nickname')
+    }
+
+    fetch('/api/person', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(addedPerson)
+    })
+      .then(async r => {
+        const data = await r.json()
+        setFavoritePeople([ ...favoritePeople, data.createdRegister ])
+      })
   }
 
   return (
@@ -223,8 +226,8 @@ export default function Home({ githubUser }) {
                   <input
                     type='text'
                     name='nickname'
-                    placeholder='Nick da pessoa no Github...'
-                    aria-label='Nick da pessoa no Github...'
+                    placeholder='Insira o nick da pessoa no Github...'
+                    aria-label='Insira o nick da pessoa no Github...'
                   />
                 </div>
                 <div>
