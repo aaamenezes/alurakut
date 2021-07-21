@@ -33,30 +33,24 @@ function ProfileSidebar({ githubUser }) {
 
 export default function Home({ githubUser }) {
   const [ communities, setCommunities ] = useState([])
-  const favoritePeople = [
-    'omariosouto',
-    'rodrigoktarouco',
-    'andre-noel',
-    'juunegreiros',
-    'felipefialho',
-    'diego3g',
-    // 'peas',
-    // 'rafaballerini',
-    // 'marcobrunodev',
-    // 'willianjusten',
-    // 'emersonbroga',
-    // 'maykbrito'
-  ].map(person => {
-    return {
-      title: person,
-      imageUrl: `https://github.com/${person}.png`,
-      pageUrl: `https://github.com/${person}`
-    }
-  })
+  const [ favoritePeople, setFavoritePeople ] = useState([])
+
+  // 'omariosouto',
+  // 'andre-noel',
+  // 'juunegreiros',
+  // 'felipefialho',
+  // 'diego3g',
+  // 'peas',
+  // 'rafaballerini',
+  // 'marcobrunodev',
+  // 'willianjusten',
+  // 'emersonbroga',
+  // 'maykbrito'
 
   const [ followers, setFollowers ] = useState([])
 
   useEffect(() => {
+    // Carregar seguidores do Github
     fetch('https://api.github.com/users/aaamenezes/followers')
       .then(r => r.json())
       .then(r => {
@@ -70,7 +64,7 @@ export default function Home({ githubUser }) {
         setFollowers(rFormatted)
       })
 
-    // GraphQL
+    // Carregar comunidades no DatoCMS - GraphQL
     const communityQuery = {
       query: `query {
         allCommunities {
@@ -82,19 +76,51 @@ export default function Home({ githubUser }) {
       }`
     }
 
-    fetch('https://graphql.datocms.com/', {
+    const cmsurl = 'https://graphql.datocms.com/'
+    const apiToken = '5562720c87d0c6d702ed3649a523ba'
+
+    fetch(cmsurl, {
       method: 'POST',
       headers: {
-        'Authorization': '5562720c87d0c6d702ed3649a523ba',
+        'Authorization': apiToken,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
       body: JSON.stringify(communityQuery)
     })
       .then(r => r.json())
+      .then(r => setCommunities(r.data.allCommunities))
+    
+    // Carregar pessoas da comunidade de programação no DatoCMS - GraphQL
+    const favoritePeopleQuery = {
+      query: `query {
+        allPeople {
+          nickname
+        }
+      }`
+    }
+
+    fetch(cmsurl, {
+      method: 'POST',
+      headers: {
+        'Authorization': apiToken,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(favoritePeopleQuery)
+    })
+      .then(r => r.json())
       .then(r => {
-        setCommunities(r.data.allCommunities)
+        const favoritePeople = r.data.allPeople.map(person => {
+          return {
+            title: person.nickname,
+            imageUrl: `https://github.com/${person.nickname}.png`,
+            pageUrl: `https://github.com/${person.nickname}`
+          }
+        })
+        setFavoritePeople(favoritePeople)
       })
+
   }, [])
 
   const [ activeForm, setActiveForm ] = useState('community')
@@ -123,7 +149,7 @@ export default function Home({ githubUser }) {
   }
 
   function handleSubmitPerson(event) {
-    return true
+    
   }
 
   return (
