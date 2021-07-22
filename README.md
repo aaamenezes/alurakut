@@ -22,7 +22,8 @@ Algumas das tecnologias usadas foram:
 - Next JS
 - DatoCMS
 - Consumir dados de API GraphQL
-- [Nookies](https://github.com/maticzav/nookies)
+- Nookies
+- JWT
 
 ## Referências
 
