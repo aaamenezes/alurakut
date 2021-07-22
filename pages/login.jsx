@@ -1,6 +1,6 @@
 import React from 'react'
 import { useRouter } from 'next/router'
-import nookies from 'nookies'
+import nookie from 'nookies'
 
 export default function Login() {
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function Login() {
       .then(async response => {
         const responseData = await response.json()
         const token = responseData.token;
-        nookies.set(null, 'USER_TOKEN', token, {
+        nookie.set(null, 'USER_TOKEN', token, {
           path: '/',
           maxAge: 86400 * 7
         })
@@ -39,7 +39,8 @@ export default function Login() {
           <form className="box" onSubmit={handleSubmit}>
             <p>Acesse agora mesmo com seu usuário do <strong>GitHub</strong>!</p>
             <input
-              placeholder="Usuário"
+              placeholder='Usuário'
+              name='nickname'
               value={githubUser}
               onChange={evento => setGithubUser(evento.target.value)}
             />
@@ -61,4 +62,21 @@ export default function Login() {
       </div>
     </main>
   )
+}
+
+export async function getServerSideProps(context) {
+  const cookies = nookie.get(context)
+  if (cookies.USER_TOKEN) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false
+      }
+    }
+  }
+
+  // const token = cookies.USER_TOKEN
+  // const { githubUser } = jwt.decode(token)
+  // return { props: { githubUser } }
+  return { props: {} }
 }
