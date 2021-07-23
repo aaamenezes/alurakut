@@ -60,7 +60,7 @@ function ProfileRelationsBox({ title, type, listItems }) {
       <ul>
         {listItems.map((item, index) => {
           return (
-            <li key={item.title}>
+            <li key={item.title + ' ' + index}>
               <a href={item.pageUrl} target='_blank' rel='external noopener'>
                 <img src={item.imageUrl} />
                 <span>{item.title}</span>
