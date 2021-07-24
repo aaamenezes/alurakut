@@ -55,4 +55,3 @@ export const Box = styled.div`
     background-color: #6F92BB;
   }
 `
-

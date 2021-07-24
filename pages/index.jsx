@@ -2,14 +2,13 @@ import React from 'react'
 import { useEffect, useState } from 'react'
 import nookie from 'nookies'
 import jwt from 'jsonwebtoken'
-import { Box } from '../src/components/Box'
-import ProfileRelationsBox from '../src/components/ProfileRelations'
 import MainGrid from '../src/components/MainGrid'
-import { AlurakutMenu, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons'
-import Button from '../src/components/Button'
+import { AlurakutMenu } from '../src/lib/AlurakutCommons'
 import UseRequest from '../src/utils/UseRequest'
 import formatGithubPerson from '../src/utils/formatGithubPerson'
 import ProfileSidebar from '../src/components/ProfileSidebar'
+import WelcomeArea from '../src/components/WelcomeArea'
+import ProfileRelationsArea from '../src/components/ProfileRelationsArea'
 
 export default function Home({ githubUser }) {
   const [ communities, setCommunities ] = useState([])
@@ -128,105 +127,19 @@ export default function Home({ githubUser }) {
     <>
       <AlurakutMenu githubUser={githubUser} />
       <MainGrid>
-        <div className='profileArea' style={{ gridArea: 'profile' }}>
-          <ProfileSidebar githubUser={githubUser} />
-        </div>
-        <div className='welcomeArea' style={{ gridArea: 'welcome' }}>
-          <Box>
-            <h1 className="title">Bem vinde</h1>
-            <OrkutNostalgicIconSet />
-          </Box>
-          <Box>
-            <Box style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              paddingLeft: 0,
-              paddingRight: 0,
-            }}>
-              <Button
-                type='button'
-                text='Criar comunidade'
-                active={activeForm === 'community'}
-                onClick={() => setActiveForm('community')}
-              />
-              <Button
-                type='button'
-                text='Adicionar pessoa da comunidade'
-                active={activeForm === 'person'}
-                onClick={() => setActiveForm('person')}
-              />
-            </Box>
-            {
-              activeForm === 'community' &&
-              <form onSubmit={handleSubmitCommunity}>
-                <div>
-                  <input
-                    type='text'
-                    name='title'
-                    placeholder='Nome da comunidade...'
-                    aria-label='Nome da comunidade...'
-                    required
-                  />
-                </div>
-                <div>
-                  <input
-                    type='text'
-                    name='image'
-                    placeholder='URL de capa'
-                    aria-label='URL de capa'
-                    required
-                  />
-                </div>
-                <div>
-                  <input
-                    type='text'
-                    name='url'
-                    placeholder='URL de direcionamento'
-                    aria-label='URL de direcionamento'
-                    required
-                  />
-                </div>
-                <div>
-                  <button type="submit">Criar comunidade</button>
-                </div>
-              </form>
-            }
-            {
-              activeForm === 'person' &&
-              <form onSubmit={handleSubmitPerson}>
-                <div>
-                  <input
-                    type='text'
-                    name='nickname'
-                    placeholder='Insira o nick da pessoa no Github...'
-                    aria-label='Insira o nick da pessoa no Github...'
-                    required
-                  />
-                </div>
-                <div>
-                  <button type="submit">Adicionar pessoa</button>
-                </div>
-              </form>
-            }
-          </Box>
-        </div>
-        <div className='profileRelationsArea' style={{ gridArea: 'profileRelations' }}>
-          <ProfileRelationsBox
-            title='Seguidores'
-            type='person'
-            listItems={followers}
-          />
-          <ProfileRelationsBox
-            title='Comunidades'
-            type='community'
-            listItems={communities}
-          />
-          <ProfileRelationsBox
-            title='Pessoas da comunidade'
-            type='person'
-            listItems={favoritePeople}
-          />
-        </div>
+        <ProfileSidebar githubUser={githubUser} />
+        <WelcomeArea
+          githubUser={githubUser}
+          activeForm={activeForm}
+          setActiveForm={setActiveForm}
+          handleSubmitCommunity={handleSubmitCommunity}
+          handleSubmitPerson={handleSubmitPerson}
+        />
+        <ProfileRelationsArea
+          followers={followers}
+          communities={communities}
+          favoritePeople={favoritePeople}
+        />
       </MainGrid>
     </>
   )
