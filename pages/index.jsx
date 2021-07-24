@@ -16,15 +16,15 @@ export default function Home({ githubUser }) {
   const [ followers, setFollowers ] = useState([])
   const [ activeForm, setActiveForm ] = useState('community')
 
+  const cmsurl = 'https://graphql.datocms.com/'
+  const apiToken = '5562720c87d0c6d702ed3649a523ba'
+
   useEffect(() => {
     // Carregar seguidores do Github
-    UseRequest('https://api.github.com/users/aaamenezes/followers').then(res => {
+    UseRequest(`https://api.github.com/users/${githubUser}/followers`).then(res => {
       const followersFormatted = res.map(follower => formatGithubPerson(follower.login))
       setFollowers(followersFormatted)
     })
-
-    const cmsurl = 'https://graphql.datocms.com/'
-    const apiToken = '5562720c87d0c6d702ed3649a523ba'
 
     // Carregar comunidades no DatoCMS - GraphQL
     const communityQuery = {
@@ -52,11 +52,14 @@ export default function Home({ githubUser }) {
       setCommunities(res.data.allCommunities)
     })
     
-    // Carregar pessoas da comunidade de programação no DatoCMS - GraphQL
+  }, [])
+
+  useEffect(() => { // Carregar pessoas da comunidade de programação no DatoCMS - GraphQL
     const favoritePeopleQuery = {
       query: `query {
         allPeople {
           nickname
+          id
         }
       }`
     }
@@ -72,56 +75,10 @@ export default function Home({ githubUser }) {
     }
 
     UseRequest(cmsurl, favoritePeopleRequestOptions).then(res => {
-      const favoritePeople = res.data.allPeople.map(person => formatGithubPerson(person.nickname))
+      const favoritePeople = res.data.allPeople.map(person => formatGithubPerson(person))
       setFavoritePeople(favoritePeople)
     })
-
-  }, [])
-
-  function handleSubmitCommunity(event) {
-    event.preventDefault()
-    const formData = new FormData(event.target)
-
-    const addedCommunity = {
-      title: formData.get('title'),
-      imageUrl: formData.get('image'),
-      pageUrl: formData.get('url'),
-    }
-
-    fetch('/api/communities', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(addedCommunity)
-    })
-      .then(async r => {
-        const data = await r.json()
-        setCommunities([ ...communities, data.createdRegister ])
-      })
-  }
-
-  function handleSubmitPerson(event) {
-    event.preventDefault()
-    const formData = new FormData(event.target)
-
-    const addedPerson = {
-      nickname: formData.get('nickname')
-    }
-
-    fetch('/api/person', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(addedPerson)
-    })
-      .then(async res => {
-        const data = await res.json()
-        const newGithubPerson = formatGithubPerson(data.createdRegister.nickname)
-        setFavoritePeople([ ...favoritePeople, newGithubPerson ])
-      })
-  }
+  }, [favoritePeople])
 
   return (
     <>
@@ -132,8 +89,6 @@ export default function Home({ githubUser }) {
           githubUser={githubUser}
           activeForm={activeForm}
           setActiveForm={setActiveForm}
-          handleSubmitCommunity={handleSubmitCommunity}
-          handleSubmitPerson={handleSubmitPerson}
         />
         <ProfileRelationsArea
           followers={followers}

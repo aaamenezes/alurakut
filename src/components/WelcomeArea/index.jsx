@@ -2,9 +2,53 @@ import { OrkutNostalgicIconSet } from '../../lib/AlurakutCommons'
 import { Box } from '../Box'
 import Button from '../Button'
 
-export default function WelcomeArea({
-  activeForm, setActiveForm, handleSubmitCommunity, handleSubmitPerson
-}) {
+export default function WelcomeArea({ activeForm, setActiveForm }) {
+
+  function handleSubmitCommunity(event) {
+    event.preventDefault()
+    const formData = new FormData(event.target)
+
+    const addedCommunity = {
+      title: formData.get('title'),
+      imageUrl: formData.get('image'),
+      pageUrl: formData.get('url'),
+    }
+
+    fetch('/api/communities', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(addedCommunity)
+    })
+      .then(async r => {
+        const data = await r.json()
+        setCommunities([ ...communities, data.createdRegister ])
+      })
+  }
+
+  function handleSubmitPerson(event) {
+    event.preventDefault()
+    const formData = new FormData(event.target)
+
+    const addedPerson = {
+      nickname: formData.get('nickname')
+    }
+
+    fetch('/api/addPerson', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(addedPerson)
+    })
+      .then(async res => {
+        const data = await res.json()
+        const newGithubPerson = formatGithubPerson(data.createdRegister.nickname)
+        setFavoritePeople([ ...favoritePeople, newGithubPerson ])
+      })
+  }
+
   return (
     <>
       <div className='welcomeArea' style={{ gridArea: 'welcome' }}>
