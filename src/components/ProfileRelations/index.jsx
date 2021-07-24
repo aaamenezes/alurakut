@@ -51,7 +51,7 @@ const ProfileRelationsBoxStyled = styled(Box)`
   }
 `
 
-function ProfileRelationsBox({ title, type, listItems }) {
+function ProfileRelationsBox({ title, listItems }) {
   return (
     <ProfileRelationsBoxStyled>
       <h2 className='smallTitle'>

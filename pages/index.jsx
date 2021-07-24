@@ -5,32 +5,11 @@ import jwt from 'jsonwebtoken'
 import { Box } from '../src/components/Box'
 import ProfileRelationsBox from '../src/components/ProfileRelations'
 import MainGrid from '../src/components/MainGrid'
-import {
-  AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet
-} from '../src/lib/AlurakutCommons'
+import { AlurakutMenu, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons'
 import Button from '../src/components/Button'
 import UseRequest from '../src/utils/UseRequest'
-
-function ProfileSidebar({ githubUser }) {
-  const imageURL = `https://github.com/${githubUser}.png`
-  return (
-    <Box as='aside'>
-      <img
-        src={imageURL}
-        alt="profile picture"
-        style={{ borderRadius: '8px'}}
-      />
-      <hr />
-      <p>
-        <a className='boxLink' href={`https://github.com/${githubUser}`}>
-          @{githubUser}
-        </a>
-      </p>
-      <hr />
-      <AlurakutProfileSidebarMenuDefault />
-    </Box>
-  )
-}
+import formatGithubPerson from '../src/utils/formatGithubPerson'
+import ProfileSidebar from '../src/components/ProfileSidebar'
 
 export default function Home({ githubUser }) {
   const [ communities, setCommunities ] = useState([])
@@ -41,13 +20,7 @@ export default function Home({ githubUser }) {
   useEffect(() => {
     // Carregar seguidores do Github
     UseRequest('https://api.github.com/users/aaamenezes/followers').then(res => {
-      const followersFormatted = res.map(item => {
-        return {
-          title: item.login,
-          imageUrl: item.avatar_url,
-          pageUrl: item.html_url
-        }
-      })
+      const followersFormatted = res.map(follower => formatGithubPerson(follower.login))
       setFollowers(followersFormatted)
     })
 
@@ -100,13 +73,7 @@ export default function Home({ githubUser }) {
     }
 
     UseRequest(cmsurl, favoritePeopleRequestOptions).then(res => {
-      const favoritePeople = res.data.allPeople.map(person => {
-        return {
-          title: person.nickname,
-          imageUrl: `https://github.com/${person.nickname}.png`,
-          pageUrl: `https://github.com/${person.nickname}`
-        }
-      })
+      const favoritePeople = res.data.allPeople.map(person => formatGithubPerson(person.nickname))
       setFavoritePeople(favoritePeople)
     })
 
@@ -150,9 +117,10 @@ export default function Home({ githubUser }) {
       },
       body: JSON.stringify(addedPerson)
     })
-      .then(async r => {
-        const data = await r.json()
-        setFavoritePeople([ ...favoritePeople, data.createdRegister ])
+      .then(async res => {
+        const data = await res.json()
+        const newGithubPerson = formatGithubPerson(data.createdRegister.nickname)
+        setFavoritePeople([ ...favoritePeople, newGithubPerson ])
       })
   }
 
@@ -197,6 +165,7 @@ export default function Home({ githubUser }) {
                     name='title'
                     placeholder='Nome da comunidade...'
                     aria-label='Nome da comunidade...'
+                    required
                   />
                 </div>
                 <div>
@@ -205,6 +174,7 @@ export default function Home({ githubUser }) {
                     name='image'
                     placeholder='URL de capa'
                     aria-label='URL de capa'
+                    required
                   />
                 </div>
                 <div>
@@ -213,6 +183,7 @@ export default function Home({ githubUser }) {
                     name='url'
                     placeholder='URL de direcionamento'
                     aria-label='URL de direcionamento'
+                    required
                   />
                 </div>
                 <div>
@@ -229,6 +200,7 @@ export default function Home({ githubUser }) {
                     name='nickname'
                     placeholder='Insira o nick da pessoa no Github...'
                     aria-label='Insira o nick da pessoa no Github...'
+                    required
                   />
                 </div>
                 <div>
