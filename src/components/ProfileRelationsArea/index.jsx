@@ -1,6 +1,11 @@
 import ProfileRelationsBox from '../ProfileRelations'
 
-export default function ProfileRelationsArea({ followers, communities, favoritePeople }) {
+export default function ProfileRelationsArea({
+  followers,
+  communities,
+  favoritePeople,
+  setFavoritePeople
+}) {
   return (
     <>
       <div className='profileRelationsArea' style={{ gridArea: 'profileRelations' }}>
@@ -13,11 +18,14 @@ export default function ProfileRelationsArea({ followers, communities, favoriteP
           title='Comunidades'
           type='community'
           listItems={communities}
+          deleteOption
         />
         <ProfileRelationsBox
           title='Pessoas da comunidade'
           type='person'
           listItems={favoritePeople}
+          setListItems={setFavoritePeople}
+          deleteOption
         />
       </div>
     </>

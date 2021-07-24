@@ -1,8 +1,9 @@
-import { OrkutNostalgicIconSet } from '../../lib/AlurakutCommons'
 import { Box } from '../Box'
 import Button from '../Button'
+import formatGithubPerson from '../../utils/formatGithubPerson'
+import { OrkutNostalgicIconSet } from '../../lib/AlurakutCommons'
 
-export default function WelcomeArea({ activeForm, setActiveForm }) {
+export default function WelcomeArea({ activeForm, setActiveForm, favoritePeople, setFavoritePeople }) {
 
   function handleSubmitCommunity(event) {
     event.preventDefault()
@@ -44,7 +45,7 @@ export default function WelcomeArea({ activeForm, setActiveForm }) {
     })
       .then(async res => {
         const data = await res.json()
-        const newGithubPerson = formatGithubPerson(data.createdRegister.nickname)
+        const newGithubPerson = formatGithubPerson(data.createdRegister)
         setFavoritePeople([ ...favoritePeople, newGithubPerson ])
       })
   }

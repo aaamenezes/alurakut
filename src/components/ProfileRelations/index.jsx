@@ -8,6 +8,38 @@ const ProfileRelationsBoxStyled = styled(Box)`
     grid-template-columns: 1fr 1fr 1fr; 
     /* max-height: 220px; */
     list-style: none;
+
+    li {
+      position: relative;
+
+      &:hover {
+       .close, .nickname {
+          opacity: 1;
+        }
+      }
+
+      .close {
+        color: #FFFFFF;
+        font-size: 20px;
+        line-height: .6;
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        z-index: 2;
+        display: -webkit-box;
+        opacity: 0;
+        transition: .3s;
+        -webkit-line-clamp: 3;
+        user-select: none;
+        -webkit-box-orient: vertical;
+        cursor: pointer;
+        
+        &:hover {
+          opacity: 1;
+          transform: scale(1.4)
+        }
+      }
+    }
   }
   img {
     object-fit: cover;
@@ -22,14 +54,18 @@ const ProfileRelationsBoxStyled = styled(Box)`
     position: relative;
     overflow: hidden;
     border-radius: 8px;
-    span {
+    &:hover {
+      opacity: 1;
+    }
+    .nickname {
       color: #FFFFFF;
       font-size: 10px;
       position: absolute;
       left: 0;
       bottom: 10px;
       z-index: 2;
-      padding: 0 4px;
+      opacity: 0;
+      padding: 0 10px;
       overflow: hidden;
       text-overflow: ellipsis;
       width: 100%;
@@ -51,7 +87,22 @@ const ProfileRelationsBoxStyled = styled(Box)`
   }
 `
 
-function ProfileRelationsBox({ title, listItems }) {
+function handleRemove(event, itemID, listItems, setListItems) {
+  fetch('/api/removePerson', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'itemID': itemID
+    }
+  })
+    .then(res => res.json())
+    .then(res => {
+      const newListItems = listItems.filter(item => item.id !== res.res.id)
+      setListItems(newListItems)
+    })
+}
+
+function ProfileRelationsBox({ title, listItems, setListItems, deleteOption }) {
   return (
     <ProfileRelationsBoxStyled>
       <h2 className='smallTitle'>
@@ -63,8 +114,16 @@ function ProfileRelationsBox({ title, listItems }) {
             <li key={item.title + ' ' + index}>
               <a href={item.pageUrl} target='_blank' rel='external noopener'>
                 <img src={item.imageUrl} />
-                <span>{item.title}</span>
+                <span className='nickname'>{item.title}</span>
               </a>
+              {
+                deleteOption && (
+                <span className="close" onClick={
+                  () => handleRemove(event, item.id, listItems, setListItems)
+                }>
+                  &times;
+                </span>
+              )}
             </li>
           )
         })}

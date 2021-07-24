@@ -21,10 +21,17 @@ export default function Home({ githubUser }) {
 
   useEffect(() => {
     // Carregar seguidores do Github
-    UseRequest(`https://api.github.com/users/${githubUser}/followers`).then(res => {
-      const followersFormatted = res.map(follower => formatGithubPerson(follower.login))
-      setFollowers(followersFormatted)
-    })
+    UseRequest(`https://api.github.com/users/${githubUser}/followers`)
+      .then(res => {
+        const followersClean = res.map(follower => {
+          return {
+            nickname: follower.login,
+            id: follower.id
+          }
+        })
+        const followersFormatted = followersClean.map(follower => formatGithubPerson(follower))
+        setFollowers(followersFormatted)
+      })
 
     // Carregar comunidades no DatoCMS - GraphQL
     const communityQuery = {
@@ -51,10 +58,8 @@ export default function Home({ githubUser }) {
     UseRequest(cmsurl, communityRequestOptions).then(res => {
       setCommunities(res.data.allCommunities)
     })
-    
-  }, [])
 
-  useEffect(() => { // Carregar pessoas da comunidade de programação no DatoCMS - GraphQL
+    // Carregar pessoas da comunidade de programação no DatoCMS - GraphQL
     const favoritePeopleQuery = {
       query: `query {
         allPeople {
@@ -75,10 +80,12 @@ export default function Home({ githubUser }) {
     }
 
     UseRequest(cmsurl, favoritePeopleRequestOptions).then(res => {
-      const favoritePeople = res.data.allPeople.map(person => formatGithubPerson(person))
+      const favoritePeople = res.data.allPeople.map(
+        person => formatGithubPerson(person)
+      )
       setFavoritePeople(favoritePeople)
     })
-  }, [favoritePeople])
+  }, [])
 
   return (
     <>
@@ -89,11 +96,14 @@ export default function Home({ githubUser }) {
           githubUser={githubUser}
           activeForm={activeForm}
           setActiveForm={setActiveForm}
+          favoritePeople={favoritePeople}
+          setFavoritePeople={setFavoritePeople}
         />
         <ProfileRelationsArea
           followers={followers}
           communities={communities}
           favoritePeople={favoritePeople}
+          setFavoritePeople={setFavoritePeople}
         />
       </MainGrid>
     </>

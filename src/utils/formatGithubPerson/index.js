@@ -1,7 +1,8 @@
-export default function formatGithubPerson(nickname) {
+export default function formatGithubPerson(person) {
   return {
-    title: nickname,
-    imageUrl: `https://github.com/${nickname}.png`,
-    pageUrl: `https://github.com/${nickname}`
+    title: person.nickname,
+    imageUrl: `https://github.com/${person.nickname}.png`,
+    pageUrl: `https://github.com/${person.nickname}`,
+    id: person.id
   }
 }
