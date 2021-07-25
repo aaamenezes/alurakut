@@ -1,6 +1,6 @@
 import { SiteClient } from 'datocms-client'
 
-export default async function createPerson(request, response) {
+export default async function removeRegister(request, response) {
   if (request.method === 'POST') {
     const token = '2276c2994e2b3695c7b5ec48c291c3'
     const client = new SiteClient(token)
@@ -8,7 +8,6 @@ export default async function createPerson(request, response) {
     await client.items.destroy(itemID)
       .then(res => response.json({ res }))
       .catch(error => console.error(error))
-
     return
   }
 

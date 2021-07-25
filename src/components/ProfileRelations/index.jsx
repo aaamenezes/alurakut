@@ -88,7 +88,7 @@ const ProfileRelationsBoxStyled = styled(Box)`
 `
 
 function handleRemove(event, itemID, listItems, setListItems) {
-  fetch('/api/removePerson', {
+  fetch('/api/removeRegister', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ function ProfileRelationsBox({ title, listItems, setListItems, deleteOption }) {
               {
                 deleteOption && (
                 <span className="close" onClick={
-                  () => handleRemove(event, item.id, listItems, setListItems)
+                  event => handleRemove(event, item.id, listItems, setListItems)
                 }>
                   &times;
                 </span>

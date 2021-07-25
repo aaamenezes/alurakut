@@ -98,12 +98,16 @@ export default function Home({ githubUser }) {
           setActiveForm={setActiveForm}
           favoritePeople={favoritePeople}
           setFavoritePeople={setFavoritePeople}
+          communities={communities}
+          setCommunities={setCommunities}
         />
         <ProfileRelationsArea
           followers={followers}
           communities={communities}
           favoritePeople={favoritePeople}
           setFavoritePeople={setFavoritePeople}
+          communities={communities}
+          setCommunities={setCommunities}
         />
       </MainGrid>
     </>

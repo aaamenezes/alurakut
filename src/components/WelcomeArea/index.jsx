@@ -3,7 +3,14 @@ import Button from '../Button'
 import formatGithubPerson from '../../utils/formatGithubPerson'
 import { OrkutNostalgicIconSet } from '../../lib/AlurakutCommons'
 
-export default function WelcomeArea({ activeForm, setActiveForm, favoritePeople, setFavoritePeople }) {
+export default function WelcomeArea({
+  activeForm,
+  setActiveForm,
+  favoritePeople,
+  setFavoritePeople,
+  communities,
+  setCommunities
+}) {
 
   function handleSubmitCommunity(event) {
     event.preventDefault()
